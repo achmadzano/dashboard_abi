@@ -133,6 +133,15 @@ DIMENSI = {
     ]
 }
 
+# Bobot indikator per pertanyaan (dalam persen, urut sesuai DIMENSI)
+BOBOT = {
+    'Proses': [4.44, 3.88, 6.22, 7.77, 10.36, 5.18, 15.54, 31.08, 10.36, 5.18],
+    'Teknologi': [19.74, 9.87, 39.47, 7.89, 9.87, 13.16],
+    'Environment': [10.81, 32.43, 16.22, 8.11, 32.43],
+    'Sosial': [54.55, 18.18, 27.27],
+    'Ekonomi': [27.27, 18.18, 54.55]
+}
+
 # Input jawaban untuk setiap pertanyaan per dimensi
 st.header('Isi Penilaian')
 jawaban = {}
@@ -150,8 +159,13 @@ for dim, pertanyaans in DIMENSI.items():
     jawaban[dim] = scores
 
 if st.button('Submit'):
-    # Hitung rata-rata per dimensi
-    dimensi_scores = {dim: np.mean(scores) for dim, scores in jawaban.items()}
+    # Hitung skor per dimensi dengan rumus baru
+    dimensi_scores = {}
+    for dim, scores in jawaban.items():
+        bobot = BOBOT[dim]
+        n = len(scores)
+        nilai_dimensi = sum([s * (b/100) / n for s, b in zip(scores, bobot)])
+        dimensi_scores[dim] = nilai_dimensi * n  # agar skala tetap 1-5 jika semua skor 5
     # Radar chart
     categories = list(dimensi_scores.keys())
     values = list(dimensi_scores.values())
@@ -165,6 +179,24 @@ if st.button('Submit'):
         )
     )
     st.plotly_chart(fig)
+    # Penjelasan rumus spider chart
+    st.markdown("""
+    **Rumus Perhitungan Spider Chart:**
+    
+    Untuk setiap indikator pada suatu dimensi:
+    
+    nilai_indikator = skala × (bobot / 100) ÷ jumlah pertanyaan dimensi
+    
+    - **skala**: nilai input user (1-5)
+    - **bobot**: bobot indikator (dalam persen)
+    - **jumlah pertanyaan dimensi**: banyaknya indikator pada dimensi tersebut
+    
+    Nilai dimensi adalah penjumlahan seluruh nilai_indikator pada dimensi tersebut:
+    
+    nilai_dimensi = jumlah seluruh nilai_indikator pada dimensi
+    
+    Dimana n adalah jumlah indikator pada dimensi tersebut.
+    """)
     # Dimensi terendah dan tertinggi
     min_dim = min(dimensi_scores, key=dimensi_scores.get)
     max_dim = max(dimensi_scores, key=dimensi_scores.get)
