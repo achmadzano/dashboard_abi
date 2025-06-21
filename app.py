@@ -144,21 +144,23 @@ BOBOT = {
 
 # Input jawaban untuk setiap pertanyaan per dimensi
 st.header('Isi Penilaian')
-jawaban = {}
-for dim, pertanyaans in DIMENSI.items():
-    st.subheader(dim)
-    scores = []
-    for i, q in enumerate(pertanyaans):
-        st.markdown(f"**{q['judul']}**")
-        st.markdown(f"<span style='font-size: 0.9em; color: #555;'>{q['definisi']}</span>", unsafe_allow_html=True)
-        score = st.slider('Jawaban (1-5)', 1, 5, 3, key=f'{dim}_score_{i}')
-        img_path = f"{dim}_{i}.png"
-        if os.path.exists(img_path):
-            st.image(Image.open(img_path), caption=f'Penjelasan Level untuk pertanyaan ini', use_container_width=True)
-        scores.append(score)
-    jawaban[dim] = scores
+with st.form('form_penilaian'):
+    jawaban = {}
+    for dim, pertanyaans in DIMENSI.items():
+        st.subheader(dim)
+        scores = []
+        for i, q in enumerate(pertanyaans):
+            st.markdown(f"**{q['judul']}**")
+            st.markdown(f"<span style='font-size: 0.9em; color: #555;'>{q['definisi']}</span>", unsafe_allow_html=True)
+            score = st.slider('Jawaban (1-5)', 1, 5, 3, key=f'{dim}_score_{i}')
+            img_path = f"{dim}_{i}.png"
+            if os.path.exists(img_path):
+                st.image(Image.open(img_path), caption=f'Penjelasan Level untuk pertanyaan ini', use_container_width=True)
+            scores.append(score)
+        jawaban[dim] = scores
+    submitted = st.form_submit_button('Submit')
 
-if st.button('Submit'):
+if 'submitted' in locals() and submitted:
     # Hitung skor per dimensi dengan rumus baru
     dimensi_scores = {}
     for dim, scores in jawaban.items():
