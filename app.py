@@ -5,7 +5,7 @@ import os
 from PIL import Image
 
 # Judul aplikasi
-st.title('Form Penilaian 5 Dimensi')
+st.title('Alat Ukur Kematangan dan Kesiapan Lean 4.0 Dengan Sustainability untuk Perusahaan Bahan Kimia')
 
 # Input nama dan nama perusahaan
 nama = st.text_input('Nama')
